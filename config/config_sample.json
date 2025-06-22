@@ -1,0 +1,11 @@
+{
+    "shortcut_key": "print_screen",
+    "printer_name": "Microsoft Print to PDF",
+    "display_id": "DISPLAY1",
+    "save_mode": "save_only",
+    "orientation": "portrait",
+    "retention_days": 10,
+    "snipping_opt_out": false,
+    "launch_paint": true,
+    "exclude_taskbar": false
+}
