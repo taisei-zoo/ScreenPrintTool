@@ -28,15 +28,6 @@ import logging
 from pathlib import Path
 import psutil
 
-# DPIスケーリングの影響を排除（BitBlt整合）
-try:
-    ctypes.windll.shcore.SetProcessDpiAwareness(1)  # SYSTEM_DPI_AWARE
-except Exception:
-    try:
-        ctypes.windll.user32.SetProcessDPIAware()  # fallback for Win7など旧環境用
-    except:
-        pass
-
 # ---グローバル変数---
 # 設定GUIの変数（グローバルで使えるように）
 shortcut_label_var = None
@@ -49,6 +40,22 @@ retention_var = None
 settings_window = None
 # タスクトレイアイコン保持用（GC回避）
 tray_icon = None
+
+# DPIスケーリングの影響を排除（BitBlt整合）
+try:
+    ctypes.windll.shcore.SetProcessDpiAwareness(1)  # SYSTEM_DPI_AWARE
+except Exception:
+    try:
+        ctypes.windll.user32.SetProcessDPIAware()  # fallback for Win7など旧環境用
+    except:
+        pass
+
+# アイコンファイルのパス
+if getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(sys.executable)  # EXE実行時（PyInstaller）
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # スクリプト実行時
+
 
 class AppConfig:
     def __init__(self, path):
@@ -107,9 +114,6 @@ A4_WIDTH_PX = 2480
 A4_HEIGHT_PX = 3508
 CONFIG_PATH = os.path.join( os.environ["LOCALAPPDATA"], "ScreenPrintTool", "config.json")
 SAVE_DIR = os.path.join(os.path.expanduser("~"), "Pictures", "ScreenPrintTool")
-
-#GUI値をconfigに設定する
-
 
 # ディスプレイの物理解像度取得
 def get_physical_resolution(display_index):
@@ -455,7 +459,7 @@ def setup_tray_icon():
 
     # アイコン画像の読み込み
     try:
-        icon_image = Image.open("C:/Program Files/ScreenPrintTool/icon.png")
+        icon_image = Image.open(os.path.join(BASE_DIR, "icon.png"))
     except Exception:
         icon_image = Image.new("RGB", (64, 64), "gray")  # 代替アイコン
 
@@ -495,7 +499,7 @@ def show_settings_window():
 
     root = tk.Tk()
     try:
-        icon_path = "C:/Program Files/ScreenPrintTool/icon.png"
+        icon_path = os.path.join(BASE_DIR, "icon.png")
         root.iconphoto(False, tk.PhotoImage(file=icon_path))
     except Exception:
         pass  # 読み込み失敗時はデフォルトのまま
